@@ -181,3 +181,23 @@ no no I mean we create the WaitlistService but in the WaitlistScreen we dont use
 (code) what is the new version of this file
 
 (log for a problem)
+
+
+## adding the history feature   
+HISTORY AND TIME WHAT IS THE PROCESS OF ADDING LIKE THIS FEATURES?
+
+
+
+START WITH HISTORY
+
+
+OK THE CODE FOR THAT
+
+OK WHAT IS NEXT
+
+EXACTLY , THE CODE FOR THAT
+
+
+## snackbar problem 
+
+THE SNACK BAR DOESNT CLOSED AFTER REMOVE?
