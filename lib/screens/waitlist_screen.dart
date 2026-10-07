@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/party.dart';
-import '../services/storage_service.dart';
+import '../services/waitlist_service.dart';
 import '../widgets/add_party_form.dart';
 import '../widgets/party_list_item.dart';
 
@@ -13,10 +13,8 @@ class WaitlistScreen extends StatefulWidget {
 }
 
 class _WaitlistScreenState extends State<WaitlistScreen> {
-  final StorageService _storageService = StorageService();
+  final WaitlistService _waitlistService = WaitlistService();
 
-  List<Party> _waitlist = [];
-  int _lastTicketNumber = 0;
   bool _isLoading = true;
 
   @override
@@ -26,53 +24,75 @@ class _WaitlistScreenState extends State<WaitlistScreen> {
   }
 
   Future<void> _loadData() async {
-    final waitlist = await _storageService.loadWaitlist();
-    final lastTicketNumber = await _storageService.loadLastTicketNumber();
+    await _waitlistService.loadData();
 
     if (!mounted) return;
 
     setState(() {
-      _waitlist = waitlist;
-      _lastTicketNumber = lastTicketNumber;
       _isLoading = false;
     });
   }
 
-  Future<void> addParty({
+  Future<void> _addParty({
     required String name,
     required int numberOfPeople,
   }) async {
-    final trimmedName = name.trim();
-
-    if (trimmedName.isEmpty || numberOfPeople <= 0) {
-      return;
-    }
-
-    final newTicketNumber = _lastTicketNumber + 1;
-
-    final party = Party(
-      name: trimmedName,
+    await _waitlistService.addParty(
+      name: name,
       numberOfPeople: numberOfPeople,
-      ticketNumber: newTicketNumber,
     );
 
-    setState(() {
-      _waitlist.add(party);
-      _lastTicketNumber = newTicketNumber;
-    });
+    if (!mounted) return;
 
-    await _storageService.saveWaitlist(_waitlist);
-    await _storageService.saveLastTicketNumber(_lastTicketNumber);
+    setState(() {});
   }
 
-  Future<void> removeParty(int ticketNumber) async {
-    setState(() {
-      _waitlist.removeWhere(
-        (party) => party.ticketNumber == ticketNumber,
-      );
-    });
+  Future<void> _removeParty(Party party) async {
+    final removed = await _waitlistService.removeParty(
+      party.ticketNumber,
+    );
 
-    await _storageService.saveWaitlist(_waitlist);
+    if (!mounted || !removed) return;
+
+    setState(() {});
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${party.name} removed'),
+        action: SnackBarAction(
+          label: 'UNDO',
+          onPressed: _undoLastRemoval,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _undoLastRemoval() async {
+    final restored = await _waitlistService.undoLastRemoval();
+
+    if (!mounted || !restored) return;
+
+    setState(() {});
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  }
+
+  Future<void> _updateParty({
+    required int ticketNumber,
+    required String name,
+    required int numberOfPeople,
+  }) async {
+    final updated = await _waitlistService.updateParty(
+      ticketNumber: ticketNumber,
+      name: name,
+      numberOfPeople: numberOfPeople,
+    );
+
+    if (!mounted || !updated) return;
+
+    setState(() {});
   }
 
   void _showAddPartyDialog() {
@@ -80,7 +100,31 @@ class _WaitlistScreenState extends State<WaitlistScreen> {
       context: context,
       builder: (context) {
         return AddPartyForm(
-          onAdd: addParty,
+          onSubmit: _addParty,
+        );
+      },
+    );
+  }
+
+  void _showEditPartyDialog(Party party) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AddPartyForm(
+          title: 'Edit Party',
+          submitButtonText: 'Save',
+          initialName: party.name,
+          initialNumberOfPeople: party.numberOfPeople,
+          onSubmit: ({
+            required String name,
+            required int numberOfPeople,
+          }) {
+            return _updateParty(
+              ticketNumber: party.ticketNumber,
+              name: name,
+              numberOfPeople: numberOfPeople,
+            );
+          },
         );
       },
     );
@@ -88,6 +132,8 @@ class _WaitlistScreenState extends State<WaitlistScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final waitlist = _waitlistService.waitlist;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Restaurant Waitlist'),
@@ -96,7 +142,7 @@ class _WaitlistScreenState extends State<WaitlistScreen> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : _waitlist.isEmpty
+          : waitlist.isEmpty
               ? const Center(
                   child: Text(
                     'No parties waiting',
@@ -105,14 +151,15 @@ class _WaitlistScreenState extends State<WaitlistScreen> {
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: _waitlist.length,
+                  itemCount: waitlist.length,
                   itemBuilder: (context, index) {
-                    final party = _waitlist[index];
+                    final party = waitlist[index];
 
                     return PartyListItem(
                       party: party,
                       partiesAhead: index,
-                      onRemove: () => removeParty(party.ticketNumber),
+                      onRemove: () => _removeParty(party),
+                      onEdit: () => _showEditPartyDialog(party),
                     );
                   },
                 ),

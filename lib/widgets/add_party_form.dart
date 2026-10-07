@@ -4,11 +4,20 @@ class AddPartyForm extends StatefulWidget {
   final Future<void> Function({
     required String name,
     required int numberOfPeople,
-  }) onAdd;
+  }) onSubmit;
+
+  final String title;
+  final String submitButtonText;
+  final String? initialName;
+  final int? initialNumberOfPeople;
 
   const AddPartyForm({
     super.key,
-    required this.onAdd,
+    required this.onSubmit,
+    this.title = 'Add Party',
+    this.submitButtonText = 'Add',
+    this.initialName,
+    this.initialNumberOfPeople,
   });
 
   @override
@@ -17,8 +26,21 @@ class AddPartyForm extends StatefulWidget {
 
 class _AddPartyFormState extends State<AddPartyForm> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _partySizeController = TextEditingController();
+  late final TextEditingController _nameController;
+  late final TextEditingController _partySizeController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _nameController = TextEditingController(
+      text: widget.initialName ?? '',
+    );
+
+    _partySizeController = TextEditingController(
+      text: widget.initialNumberOfPeople?.toString() ?? '',
+    );
+  }
 
   @override
   void dispose() {
@@ -35,15 +57,12 @@ class _AddPartyFormState extends State<AddPartyForm> {
     final name = _nameController.text.trim();
     final numberOfPeople = int.parse(_partySizeController.text);
 
-    await widget.onAdd(
+    await widget.onSubmit(
       name: name,
       numberOfPeople: numberOfPeople,
     );
 
     if (!mounted) return;
-
-    _nameController.clear();
-    _partySizeController.clear();
 
     Navigator.of(context).pop();
   }
@@ -51,7 +70,7 @@ class _AddPartyFormState extends State<AddPartyForm> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add Party'),
+      title: Text(widget.title),
       content: Form(
         key: _formKey,
         child: Column(
@@ -102,7 +121,7 @@ class _AddPartyFormState extends State<AddPartyForm> {
         ),
         ElevatedButton(
           onPressed: _submit,
-          child: const Text('Add'),
+          child: Text(widget.submitButtonText),
         ),
       ],
     );

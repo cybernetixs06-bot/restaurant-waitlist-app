@@ -6,12 +6,18 @@ class PartyListItem extends StatelessWidget {
   final Party party;
   final int partiesAhead;
   final VoidCallback onRemove;
+  final VoidCallback onEdit;
+
+
 
   const PartyListItem({
     super.key,
     required this.party,
     required this.partiesAhead,
     required this.onRemove,
+    required this.onEdit,
+
+
   });
 
   @override
@@ -32,11 +38,21 @@ class PartyListItem extends StatelessWidget {
         leading: CircleAvatar(
           child: Text('# ${party.ticketNumber}'),
         ),
-        trailing: IconButton(
-          onPressed: onRemove,
-          icon: const Icon(Icons.delete_outline),
-          tooltip: 'Remove party',
-        ),
+       trailing: Row(
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    IconButton(
+      onPressed: onEdit,
+      icon: const Icon(Icons.edit_outlined),
+      tooltip: 'Edit party',
+    ),
+    IconButton(
+      onPressed: onRemove,
+      icon: const Icon(Icons.delete_outline),
+      tooltip: 'Remove party',
+    ),
+  ],
+),
       ),
     );
   }

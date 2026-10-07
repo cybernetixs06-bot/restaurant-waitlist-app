@@ -1,17 +1,57 @@
-# restaurant_waitlist_app
+# Restaurant Waitlist App 
 
-A new Flutter project.
+## how to run the project 
 
-## Getting Started
+Clone repository.
 
-This project is a starting point for a Flutter application.
+Run flutter pub get.
 
-A few resources to get you started if this is your first Flutter project:
+Start an Android emulator.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Run flutter run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
+## Why I chose the technology and the data storage, in two sentences
+Flutter was chosen because it provides a simple cross-platform solution and is suitable for building a small mobile application quickly. SharedPreferences was chosen because the app only needs to persist a small waitlist and the last ticket number locally, without requiring a full database.
+
+
+## What is complete and what is not
+
+Complete
+Add party.
+
+Validate name.
+
+Validate party size.
+
+Generate unique ticket numbers.
+
+Display waitlist in joining order.
+
+Display parties ahead.
+
+Remove any party.
+
+Persist waitlist.
+
+Persist ticket numbering across app restarts.
+
+Edit party.
+
+Undo removal.
+
+
+
+## Not complete
+
+
+History.
+
+Estimated waiting time.
+
+
+
+## AI Suggestion Check
+I checked the AI suggestions by testing edge cases, including adding a party with an empty name, adding a party with an invalid size, removing a party and adding a new one to verify that ticket numbers are never reused, and closing and reopening the app to verify that the data persists.
+
