@@ -1,0 +1,43 @@
+import 'package:flutter/material.dart';
+
+import '../models/party.dart';
+
+class PartyListItem extends StatelessWidget {
+  final Party party;
+  final int partiesAhead;
+  final VoidCallback onRemove;
+
+  const PartyListItem({
+    super.key,
+    required this.party,
+    required this.partiesAhead,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        title: Text(
+          party.name,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(
+          '${party.numberOfPeople} people • '
+          '$partiesAhead ${partiesAhead == 1 ? 'party' : 'parties'} ahead',
+        ),
+        leading: CircleAvatar(
+          child: Text('# ${party.ticketNumber}'),
+        ),
+        trailing: IconButton(
+          onPressed: onRemove,
+          icon: const Icon(Icons.delete_outline),
+          tooltip: 'Remove party',
+        ),
+      ),
+    );
+  }
+}
