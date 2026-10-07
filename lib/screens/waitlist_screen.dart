@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_waitlist_app/screens/history_screen.dart';
 
 import '../models/party.dart';
 import '../services/waitlist_service.dart';
@@ -58,15 +59,17 @@ class _WaitlistScreenState extends State<WaitlistScreen> {
 
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${party.name} removed'),
-        action: SnackBarAction(
-          label: 'UNDO',
-          onPressed: _undoLastRemoval,
-        ),
-      ),
-    );
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: Text('${party.name} removed'),
+    duration: const Duration(seconds: 4),
+    persist: false, // allow auto-dismiss even with an action
+    action: SnackBarAction(
+      label: 'UNDO',
+      onPressed: _undoLastRemoval,
+    ),
+  ),
+);
   }
 
   Future<void> _undoLastRemoval() async {
@@ -134,10 +137,24 @@ class _WaitlistScreenState extends State<WaitlistScreen> {
   Widget build(BuildContext context) {
     final waitlist = _waitlistService.waitlist;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Restaurant Waitlist'),
+ return Scaffold(
+  appBar: AppBar(
+    title: const Text('Restaurant Waitlist'),
+    actions: [
+      IconButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HistoryScreen(),
+            ),
+          );
+        },
+        icon: const Icon(Icons.history),
+        tooltip: 'History',
       ),
+    ],
+  ),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),

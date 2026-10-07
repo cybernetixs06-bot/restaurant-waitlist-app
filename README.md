@@ -41,14 +41,15 @@ Edit party.
 
 Undo removal.
 
+History.
 
 
 ## Not complete
 
 
-History.
 
-Estimated waiting time.
+Estimated waiting time. 
+bcz there is no cretiria for estimation  the time in task 
 
 
 
